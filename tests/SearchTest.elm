@@ -11,7 +11,15 @@ import TextSearch.Search as Search
 suite : Test
 suite =
     describe "API"
-        [ test "parser (conjuction with negative term)" <|
+        [ test "parser with error (1)" <|
+            \_ ->
+                parse "!foo -bar"
+                    |> Expect.equal (Err "ill-formed query")
+        , test "parser with error (2)" <|
+            \_ ->
+                parse "foo ! bar"
+                    |> Expect.equal (Err "ill-formed query")
+        , test "parser (conjunction with negative term)" <|
             \_ ->
                 parse "foo -bar"
                     |> Expect.equal (Ok (Disjunction [ Conjunction [ Word "foo", NotWord "bar" ] ]))
@@ -22,41 +30,41 @@ suite =
         , test "simple match (positive)" <|
             \_ ->
                 Search.matchWithQueryString identity Search.NotCaseSensitive "bar" "foo bar"
-                    |> Expect.equal True
+                    |> Expect.equal (Ok True)
         , test "simple match (negative)" <|
             \_ ->
                 Search.matchWithQueryString identity Search.NotCaseSensitive "baz" "foo bar"
-                    |> Expect.equal False
+                    |> Expect.equal (Ok False)
         , test "conjunctive match (positive)" <|
             \_ ->
                 Search.matchWithQueryString identity Search.NotCaseSensitive "foo bar" "foo bar baz"
-                    |> Expect.equal True
+                    |> Expect.equal (Ok True)
         , test "conjunctive match (negative)" <|
             \_ ->
                 Search.matchWithQueryString identity Search.NotCaseSensitive "foo alpha" "foo bar baz"
-                    |> Expect.equal False
+                    |> Expect.equal (Ok False)
         , test "conjunctive match with negation (positive)" <|
             \_ ->
                 Search.matchWithQueryString identity Search.NotCaseSensitive "foo -fa" "foo bar baz"
-                    |> Expect.equal True
+                    |> Expect.equal (Ok True)
         , test "conjunctive match with negation (negative)" <|
             \_ ->
                 Search.matchWithQueryString identity Search.NotCaseSensitive "foo -bar" "foo bar baz"
-                    |> Expect.equal False
+                    |> Expect.equal (Ok False)
         , test "simple search" <|
             \_ ->
                 Search.withQueryString identity Search.NotCaseSensitive "abc" [ "abc def", "def xyz", "xyz abc  pqr" ]
-                    |> Expect.equal [ "abc def", "xyz abc  pqr" ]
+                    |> Expect.equal (Ok [ "abc def", "xyz abc  pqr" ])
         , test "conjunctive search" <|
             \_ ->
                 Search.withQueryString identity Search.NotCaseSensitive "abc xyz" [ "abc def", "def xyz", "xyz abc  pqr" ]
-                    |> Expect.equal [ "xyz abc  pqr" ]
+                    |> Expect.equal (Ok [ "xyz abc  pqr" ])
         , test "conjunctive search with negation" <|
             \_ ->
                 Search.withQueryString identity Search.NotCaseSensitive "abc -xyz" [ "abc def", "def xyz", "xyz abc  pqr" ]
-                    |> Expect.equal [ "abc def" ]
+                    |> Expect.equal (Ok [ "abc def" ])
         , test "disjunctive search with negation" <|
             \_ ->
                 Search.withQueryString identity Search.NotCaseSensitive "abc -xyz | pqr" [ "abc def", "def xyz", "xyz abc pqr" ]
-                    |> Expect.equal [ "abc def", "xyz abc pqr" ]
+                    |> Expect.equal (Ok [ "abc def", "xyz abc pqr" ])
         ]

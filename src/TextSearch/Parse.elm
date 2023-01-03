@@ -26,9 +26,14 @@ type QueryTerm
 
 
 {-| -}
-parse : String -> Result (List Parser.DeadEnd) QueryTerm
+parse : String -> Result String QueryTerm
 parse input =
-    Parser.run disjunction input
+    case Parser.run disjunction input of
+        Ok t ->
+            Ok t
+
+        Err _ ->
+            Err "ill-formed query"
 
 
 conjunction : Parser QueryTerm

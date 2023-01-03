@@ -62,15 +62,21 @@ type Config
     | NotCaseSensitive
 
 
-{-| -}
-withQueryString : (datum -> String) -> Config -> String -> List datum -> List datum
+{-|
+
+    If the query string is well-formed, `Ok filteredList` is returned. If it
+    is ill-formed, `Err errorString` is returned. At the moment, the
+    error string reads 'ill-formed query'.
+
+-}
+withQueryString : (datum -> String) -> Config -> String -> List datum -> Result String (List datum)
 withQueryString transformer config queryString dataList =
     case parse queryString of
         Ok term ->
-            withTerm transformer config term dataList
+            Ok (withTerm transformer config term dataList)
 
-        Err _ ->
-            dataList
+        Err errorMessage ->
+            Err errorMessage
 
 
 withTerm : (datum -> String) -> Config -> QueryTerm -> List datum -> List datum
@@ -78,15 +84,18 @@ withTerm transformer config term dataList =
     List.filter (matchWithQueryTerm transformer config term) dataList
 
 
-{-| -}
-matchWithQueryString : (datum -> String) -> Config -> String -> datum -> Bool
+{-| If the query string is well-formed, `Ok True/False` is returned. If it
+is ill-formed, `Err errorString` is returned. At the moment, the
+error string reads 'ill-formed query'.
+-}
+matchWithQueryString : (datum -> String) -> Config -> String -> datum -> Result String Bool
 matchWithQueryString transformer config queryString datum =
     case parse queryString of
         Ok term ->
-            matchWithQueryTerm transformer config term datum
+            Ok (matchWithQueryTerm transformer config term datum)
 
-        Err _ ->
-            False
+        Err errorMessage ->
+            Err errorMessage
 
 
 {-| -}
