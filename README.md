@@ -9,22 +9,22 @@ For example, running
 Search.withQueryString 
    identity 
    Search.NotCaseSensitive 
-   "abc -xyz | pqr"
+   "foo -bar | baz"
 ```
 
 on the list
 
 ```elm
-[ "abc def", "def xyz", "xyz abc pqr" ]
+[ "foo yada", "foo bar", "hehe, baza baza!" ]
 ```
 
 returns the list
 
 ```elm
-[ "abc def", "xyz abc pqr" ]
+[ ""foo yada", "hehe, baza baza!" ]
 ```
 
-The query string `abc -xyz | pqr` is of the form 
+The query string `foo -bar | baz` is of the form 
 `P | Q`.  It will match anything that matches `P` 
 or `Q`. The term `P` is form `word1 -word2` It will
 match anything that contains `word1` but not `word2`.
