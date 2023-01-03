@@ -3,7 +3,7 @@
     "name": "jxxcarlson/elm-text-search",
     "summary": "Search and sort a list of data using a DSL for conjunction and negation",
     "license": "MIT",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "exposed-modules": [
         "TextSearch.Parse",
         "TextSearch.Search"
