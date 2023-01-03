@@ -17,10 +17,7 @@ import Parser exposing ((|.), (|=), Parser)
 import Text.Library.ParserTools exposing (first, manySeparatedBy, text)
 
 
-{-|
-
-    Type of the parser syntax tree.
-
+{-| This is the type of the parser syntax tree.
 -}
 type QueryTerm
     = Word String

@@ -31,9 +31,9 @@ Similarly, `word1 word2` matches anything that contains
 
 ## Non-string data
 
-Suppose that you want to query data of type `List Datum`.
+Suppose that you want to query data of type `List a`.
 You can do this if you have function like
-`digest : Datum -> String`. For example, if
+`digest : a -> String`. For example, if
 
     type alias Datum =
       {   title: String
@@ -49,6 +49,8 @@ does the job — you can search using
         Search.NotCaseSensitive
         "foo -bar | baz"
 
+Below we describe the types and functions exported from this module.
+
 @docs Config, matchWithQueryStringToResult, withQueryStringToResult, matchWithQueryString, withQueryString
 
 -}
@@ -62,10 +64,7 @@ type Config
     | NotCaseSensitive
 
 
-{-|
-
-    Filter the data list using the query.  If the query is ill-formed, return the empty list.
-
+{-| Filter the data list using the query. If the query is ill-formed, return the empty list.
 -}
 withQueryString : (datum -> String) -> Config -> String -> List datum -> List datum
 withQueryString transformer config queryString dataList =
@@ -99,8 +98,8 @@ withTerm transformer config term dataList =
     List.filter (matchWithQueryTerm transformer config term) dataList
 
 
-{-| If the query string is well-formed, `True/False` is returned depending
-on whether the query string matches datum. If the query string
+{-| If the query string is well-formed, `Ok True/False` is returned depending
+on whether the query string matches the datum. If the query string
 is ill-formed, `False` is returned.
 -}
 matchWithQueryString : (datum -> String) -> Config -> String -> datum -> Bool
@@ -113,7 +112,8 @@ matchWithQueryString transformer config queryString datum =
             False
 
 
-{-| If the query string is well-formed, `True/False` is returned depending
+{-| If the query string is well-formed, `Ok True/False` is returned,
+the result depending
 on whether the query string matches datum.
 If it is ill-formed, `Err errorString` is returned. At the moment, the
 error string reads 'ill-formed query'.
