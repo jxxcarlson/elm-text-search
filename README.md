@@ -21,14 +21,14 @@ on the list
 returns the list
 
 ```elm
-[ ""foo yada", "hehe, baza baza!" ]
+[ "foo yada", "hehe, baza baza!" ]
 ```
 
 The query string `foo -bar | baz` is of the form 
 `P | Q`.  It will match anything that matches `P` 
 or `Q`. The term `P` is form `word1 -word2` It will
 match anything that contains `word1` but not `word2`.
-Similarly `word1 word2` matches anything that contains
+Similarly, `word1 word2` matches anything that contains
 `word1` and `word2`.
 
 ## Non-string data
@@ -37,7 +37,7 @@ Suppose that you want to query data of type `List Datum`.
 You can do this if you have function like 
 `digest : Datum -> String`.  For example, if
 
-```text
+```elm
 type alias Datum = 
   {   title: String
     , tags : List String
@@ -45,12 +45,17 @@ type alias Datum =
    }          
 ```
 
-Then `digest datum = String.join " " title::tags`
+Then
+
+```elm
+digest datum = String.join " " title::tags
+```
+
 does the job — you can search using
 
-```text
+```elm
 Search.withQueryString 
    digest 
    Search.NotCaseSensitive 
-   "abc -xyz | pqr"
+   "foo -bar | baz"
 ```
