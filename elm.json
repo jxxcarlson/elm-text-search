@@ -1,6 +1,6 @@
 {
     "type": "package",
-    "name": "jxxcarlson/elm-search",
+    "name": "jxxcarlson/elm-text-search",
     "summary": "Search and sort a list of data using a DSL for conjunction and negation",
     "license": "MIT",
     "version": "1.0.0",
