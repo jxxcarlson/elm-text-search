@@ -52,7 +52,7 @@ disjunction =
 -}
 term : Parser QueryTerm
 term =
-    Parser.oneOf [ positiveWord, negativeWord ]
+    Parser.oneOf [ wordWithSpaces, negativeWordWithSpaces, positiveWord, negativeWord ]
 
 
 {-|
@@ -66,6 +66,34 @@ positiveWord =
     first
         (text (\c -> Char.isAlphaNum c) (\c -> c /= ' ') |> Parser.map .content |> Parser.map Word)
         Parser.spaces
+
+
+wordWithSpaces : Parser QueryTerm
+wordWithSpaces =
+    (Parser.succeed (\start end source -> String.slice start (end - 1) source)
+        |. Parser.symbol "'"
+        |= Parser.getOffset
+        |. Parser.chompUntil "'"
+        |. Parser.symbol "'"
+        |= Parser.getOffset
+        |= Parser.getSource
+        |. Parser.spaces
+    )
+        |> Parser.map Word
+
+
+negativeWordWithSpaces : Parser QueryTerm
+negativeWordWithSpaces =
+    (Parser.succeed (\start end source -> String.slice start (end - 1) source)
+        |. Parser.symbol "-'"
+        |= Parser.getOffset
+        |. Parser.chompUntilEndOr "'"
+        |. Parser.symbol "'"
+        |= Parser.getOffset
+        |= Parser.getSource
+        |. Parser.spaces
+    )
+        |> Parser.map NotWord
 
 
 {-|

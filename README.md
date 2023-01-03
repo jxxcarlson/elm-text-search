@@ -31,6 +31,14 @@ match anything that contains `word1` but not `word2`.
 Similarly, `word1 word2` matches anything that contains
 `word1` and `word2`.
 
+## Spaces
+
+Search terms with spaces are allowed: just surround
+the term with single quotes.  The term
+`'foo bar'` will match "foo bar" but neither "bar foo"
+nor "foo baz bar".
+
+
 ## Non-string data
 
 Suppose that you want to query data of type `List Datum`.
