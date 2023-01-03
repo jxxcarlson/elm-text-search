@@ -1,4 +1,4 @@
-module TextSearch.Search exposing (matchWithQueryString, matchWithQueryTerm, withQueryString, Config(..))
+module Text.Search exposing (Config(..), matchWithQueryStringToResult, withQueryStringToResult, matchWithQueryString, withQueryString)
 
 {-|
 
@@ -49,11 +49,11 @@ does the job — you can search using
         Search.NotCaseSensitive
         "foo -bar | baz"
 
-@docs matchWithQueryString, matchWithQueryTerm, withQueryString, Config
+@docs Config, matchWithQueryStringToResult, withQueryStringToResult, matchWithQueryString, withQueryString
 
 -}
 
-import TextSearch.Parse exposing (QueryTerm(..), parse)
+import Text.Parse exposing (QueryTerm(..), parse)
 
 
 {-| -}
@@ -64,13 +64,28 @@ type Config
 
 {-|
 
-    If the query string is well-formed, `Ok filteredList` is returned. If it
-    is ill-formed, `Err errorString` is returned. At the moment, the
-    error string reads 'ill-formed query'.
+    Filter the data list using the query.  If the query is ill-formed, return the empty list.
 
 -}
-withQueryString : (datum -> String) -> Config -> String -> List datum -> Result String (List datum)
+withQueryString : (datum -> String) -> Config -> String -> List datum -> List datum
 withQueryString transformer config queryString dataList =
+    case parse queryString of
+        Ok term ->
+            withTerm transformer config term dataList
+
+        Err _ ->
+            []
+
+
+{-| Filter the data list using the query.
+If the query string is well-formed,
+`Ok filteredList` is returned. If it
+is ill-formed, `Err errorString`
+is returned. At the moment, the
+error string reads 'ill-formed query'.
+-}
+withQueryStringToResult : (datum -> String) -> Config -> String -> List datum -> Result String (List datum)
+withQueryStringToResult transformer config queryString dataList =
     case parse queryString of
         Ok term ->
             Ok (withTerm transformer config term dataList)
@@ -84,12 +99,27 @@ withTerm transformer config term dataList =
     List.filter (matchWithQueryTerm transformer config term) dataList
 
 
-{-| If the query string is well-formed, `Ok True/False` is returned. If it
-is ill-formed, `Err errorString` is returned. At the moment, the
+{-| If the query string is well-formed, `True/False` is returned depending
+on whether the query string matches datum. If the query string
+is ill-formed, `False` is returned.
+-}
+matchWithQueryString : (datum -> String) -> Config -> String -> datum -> Bool
+matchWithQueryString transformer config queryString datum =
+    case parse queryString of
+        Ok term ->
+            matchWithQueryTerm transformer config term datum
+
+        Err _ ->
+            False
+
+
+{-| If the query string is well-formed, `True/False` is returned depending
+on whether the query string matches datum.
+If it is ill-formed, `Err errorString` is returned. At the moment, the
 error string reads 'ill-formed query'.
 -}
-matchWithQueryString : (datum -> String) -> Config -> String -> datum -> Result String Bool
-matchWithQueryString transformer config queryString datum =
+matchWithQueryStringToResult : (datum -> String) -> Config -> String -> datum -> Result String Bool
+matchWithQueryStringToResult transformer config queryString datum =
     case parse queryString of
         Ok term ->
             Ok (matchWithQueryTerm transformer config term datum)

@@ -1,16 +1,20 @@
-module TextSearch.Parse exposing (QueryTerm(..), parse)
+module Text.Parse exposing (QueryTerm(..), parse)
 
 {-| The `parse` function accepts a query string and if successful produces a value of
-type `QueryTerm`. For example, the query string "foo -bar | x y" yields the QueryTerm
+type `Ok QueryTerm`. If it is unsuccessful, it returns `Err` "ill-formed query".
+For example, the query string "foo -bar | x y" yields the QueryTerm
 
-    Disjunction [ Conjunction [ Word "foo", NotWord "bar" ], Conjunction [ Word "x", Word "y" ] ]
+    Disjunction
+        [ Conjunction [ Word "foo", NotWord "bar" ]
+        , Conjunction [ Word "x", Word "y" ]
+        ]
 
 @docs QueryTerm, parse
 
 -}
 
 import Parser exposing ((|.), (|=), Parser)
-import TextSearch.Library.ParserTools exposing (first, manySeparatedBy, text)
+import Text.Library.ParserTools exposing (first, manySeparatedBy, text)
 
 
 {-|
@@ -36,14 +40,20 @@ parse input =
             Err "ill-formed query"
 
 
+disjunction : Parser QueryTerm
+disjunction =
+    Parser.succeed identity
+        |= (manySeparatedBy (Parser.symbol "| ") conjunction |> Parser.map Disjunction)
+        |. Parser.end
+
+
 conjunction : Parser QueryTerm
 conjunction =
     manySeparatedBy Parser.spaces term |> Parser.map Conjunction
 
 
-disjunction : Parser QueryTerm
-disjunction =
-    manySeparatedBy (Parser.symbol "| ") conjunction |> Parser.map Disjunction
+
+-- many term |> Parser.map Conjunction
 
 
 {-|

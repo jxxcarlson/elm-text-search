@@ -1,4 +1,4 @@
-module TextSearch.Sort exposing (sort, SortParam(..), Direction(..))
+module Text.Sort exposing (sort, SortParam(..), Direction(..))
 
 {-|
 
